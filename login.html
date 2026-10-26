@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="theme-color" content="#080c14" /><title>Kaerb Esports | Acesso administrativo</title><link rel="stylesheet" href="./css/style.css" /><link rel="stylesheet" href="./css/crud-extra.css" /></head>
+<body data-page="login" class="login-page">
+  <main class="login-shell">
+    <section class="login-brand"><div class="login-logo">K</div><span class="eyebrow">KAERB ESPORTS / ERP</span><h1>Gestão competitiva com mais clareza.</h1><p>Acesse o ambiente administrativo da Kaerb Esports com a sua conta autorizada.</p><div class="login-security"><span class="status-dot"></span><span>Acesso protegido por Supabase Auth e RLS</span></div></section>
+    <section class="login-card"><div class="login-card-head"><span class="eyebrow">ÁREA RESTRITA</span><h2>Entrar no ERP</h2><p>Use uma das contas de proprietário cadastradas.</p></div><form id="login-form"><label>E-mail<input id="login-email" type="email" autocomplete="username" required placeholder="seu@email.com" /></label><label>Senha<input id="login-password" type="password" autocomplete="current-password" required placeholder="••••••••" /></label><button class="button button-primary login-submit" type="submit">Entrar no sistema</button><p id="login-feedback" class="login-feedback" role="alert" hidden></p></form><p class="login-note">Não compartilhe credenciais. Usuários não autorizados não devem conseguir consultar ou alterar os dados.</p></section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./js/supabase-config.js"></script><script src="./js/supabase-client.js"></script><script src="./js/login.js"></script>
+</body></html>
