@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Kaerb Esports</title>
+  <desc id="desc">Marca geométrica K da Kaerb Esports</desc>
+  <defs>
+    <linearGradient id="g" x1="12" y1="12" x2="116" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67a6ff"/>
+      <stop offset="1" stop-color="#2453c5"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="34" fill="#101522"/>
+  <path d="M34 25h22v29l26-29h28L78 61l33 42H83L57 70l-1 33H34V25Z" fill="url(#g)"/>
+  <path d="M57 57h18l-9 10H57V57Z" fill="#ddebff" opacity=".8"/>
+</svg>

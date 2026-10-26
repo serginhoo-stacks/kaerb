@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080c14" />
+  <title>Kaerb Esports | Dashboard</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body data-page="dashboard">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="./dashboard.html" aria-label="Ir para o dashboard Kaerb">
+        <span class="brand-mark">K</span><span><h1>KAERB</h1><span>ESPORTS MANAGEMENT</span></span>
+      </a>
+      <div class="menu-label">MENU PRINCIPAL</div>
+      <nav class="navigation" aria-label="Menu principal">
+        <a class="nav-link" href="./dashboard.html" data-active-page="dashboard"><span>▦</span>Dashboard</a>
+        <a class="nav-link" href="./equipes.html" data-active-page="equipes"><span>♙</span>Equipes e jogadores</a>
+        <a class="nav-link" href="./financeiro.html" data-active-page="financeiro"><span>▤</span>Financeiro</a>
+        <a class="nav-link" href="./contratos.html" data-active-page="contratos"><span>▧</span>Contratos e documentos</a>
+        <a class="nav-link" href="./campeonatos.html" data-active-page="campeonatos"><span>♜</span>Campeonatos</a>
+        <a class="nav-link" href="./patrocinadores.html" data-active-page="patrocinadores"><span>◇</span>Patrocinadores</a>
+      </nav>
+      <div class="menu-label settings-label">ADMINISTRAÇÃO</div>
+      <nav class="navigation" aria-label="Administração">
+        <a class="nav-link" href="./departamentos.html" data-active-page="departamentos"><span>▦</span>Departamentos</a>
+        <a class="nav-link" href="./historico.html" data-active-page="historico"><span>◷</span>Histórico de ações</a>
+      </nav>
+      <div class="sidebar-footer"><span class="status-dot"></span><div><strong>Kaerb ERP</strong><span>Ambiente de desenvolvimento</span></div></div>
+    </aside>
+    <div class="app-main">
+      <header class="topbar"><div class="topbar-left"><span class="eyebrow">KAERB ESPORTS / ERP</span><span class="breadcrumb" data-breadcrumb>Dashboard</span></div><div class="topbar-actions"><button class="icon-button" type="button" data-logout title="Estado da integração" aria-label="Estado da integração">⌁</button><div class="user-area"><span class="user-avatar">K</span><div class="user-info"><strong>Administrador</strong><span>Proprietário</span></div></div></div></header>
+      <main class="page-content">
+        <div class="page-intro"><div><span class="eyebrow">CENTRAL DE GESTÃO</span><h2 data-page-title>Visão geral</h2><p data-page-description>Acompanhe a operação da Kaerb Esports em um só lugar.</p></div><span class="date-chip" data-current-date>Carregando data...</span></div>
+        <div class="notice"><span class="notice-icon">i</span><div><strong>Ambiente inicial conectado à interface</strong><p>Os módulos estão organizados e prontos para receber as regras de autenticação e os dados reais do Supabase. Nenhuma métrica fictícia é exibida.</p></div></div>
+        <section class="hero-card"><div class="hero-content"><span class="hero-kicker">PAINEL ADMINISTRATIVO</span><h3>Uma operação mais clara para decisões mais rápidas.</h3><p>Centralize equipes, financeiro, documentos e competições num fluxo preparado para crescer com a Kaerb.</p></div><div class="hero-actions"><a class="button button-primary" href="./equipes.html">Abrir equipes</a><button class="button button-secondary" type="button" data-demo-action>Conectar dados</button></div></section>
+        <div class="section-heading"><div><h3>Resumo da organização</h3><p>Indicadores serão alimentados por consultas seguras ao banco.</p></div><span class="live-label"><span class="status-dot"></span>Prévia</span></div>
+        <section class="metric-grid" aria-label="Indicadores">
+          <article class="metric-card"><div class="metric-top"><span>Equipes ativas</span><span class="metric-icon tone-purple">♙</span></div><strong class="metric-value">—</strong><small class="metric-note">Aguardando dados reais</small></article>
+          <article class="metric-card"><div class="metric-top"><span>Jogadores ativos</span><span class="metric-icon tone-blue">♟</span></div><strong class="metric-value">—</strong><small class="metric-note">Aguardando dados reais</small></article>
+          <article class="metric-card"><div class="metric-top"><span>Saldo financeiro</span><span class="metric-icon tone-green">R$</span></div><strong class="metric-value">—</strong><small class="metric-note">Sem valores fictícios</small></article>
+          <article class="metric-card"><div class="metric-top"><span>Próximos eventos</span><span class="metric-icon tone-orange">♜</span></div><strong class="metric-value">—</strong><small class="metric-note">Aguardando dados reais</small></article>
+        </section>
+        <div class="content-grid">
+          <section class="panel"><div class="panel-heading"><div><h3>Atividade recente</h3><p>Registos administrativos após a ativação do histórico.</p></div><a class="button button-secondary" href="./historico.html">Ver histórico</a></div><div class="empty-state"><span class="empty-icon">◷</span><h4>Ainda não há atividades para mostrar</h4><p>Quando as ações administrativas forem conectadas ao Supabase, este espaço exibirá a linha do tempo da operação.</p></div></section>
+          <section class="panel"><div class="panel-heading"><div><h3>Prontidão do sistema</h3><p>Estrutura atual do projeto.</p></div></div><div class="readiness-list"><div class="readiness-item"><span class="check">✓</span>Interface administrativa criada</div><div class="readiness-item"><span class="check">✓</span>Navegação multipágina organizada</div><div class="readiness-item"><span class="check">✓</span>Responsividade configurada</div><div class="readiness-item pending"><span class="check">○</span>Autenticação dos proprietários</div><div class="readiness-item pending"><span class="check">○</span>Integração com dados reais</div></div></section>
+        </div>
+        <footer class="page-footer"><span>KAERB ESPORTS © <span data-current-year></span></span><span>ERP de gestão empresarial</span></footer>
+      </main>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./js/supabase-config.js" defer></script><script src="./js/supabase-client.js" defer></script><script src="./js/app.js" defer></script>
+</body>
+</html>
