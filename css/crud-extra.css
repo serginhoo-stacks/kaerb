@@ -1,6 +1,7 @@
-
+```css
 /* CSS complementar do Kaerb ERP.
-   Preserve o css/style.css principal. */
+   Mantém os estilos dos módulos e adiciona o login responsivo.
+   O css/style.css principal permanece separado. */
 
 .crud-tabs,
 .crud-toolbar,
@@ -266,6 +267,7 @@
   opacity: 0.75;
 }
 
+/* Estilo complementar dos títulos de seção */
 .eyebrow {
   font-size: 0.75rem;
   letter-spacing: 0.12em;
@@ -299,6 +301,282 @@
   outline-offset: 1px;
 }
 
+/* ==========================================
+   LOGIN KAERB ESPORTS
+   ========================================== */
+
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+  overflow-x: hidden;
+}
+
+.login-page .login-shell {
+  width: min(100%, 1000px);
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.85fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 64px);
+  margin: auto;
+}
+
+.login-page .login-brand {
+  min-width: 0;
+  padding: 20px 0;
+}
+
+.login-page .login-logo {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  margin-bottom: 28px;
+  border: 1px solid rgba(112, 173, 255, 0.35);
+  border-radius: 19px;
+  color: #fff;
+  background: linear-gradient(145deg, #468fff, #234da9);
+  box-shadow: 0 12px 32px rgba(42, 104, 231, 0.25);
+  font-size: 34px;
+  font-weight: 900;
+  font-style: italic;
+}
+
+.login-page .login-brand .eyebrow,
+.login-page .login-card .eyebrow {
+  color: var(--primary-bright, #70adff);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 1.45px;
+  opacity: 1;
+}
+
+.login-page .login-brand h1 {
+  max-width: 540px;
+  margin-top: 16px;
+  font-size: clamp(32px, 4.2vw, 49px);
+  font-weight: 800;
+  letter-spacing: -1.8px;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.login-page .login-brand > p {
+  max-width: 440px;
+  margin-top: 18px;
+  color: var(--muted, #8090a6);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.login-page .login-security {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+  color: var(--text-soft, #c5cfde);
+  font-size: 11px;
+}
+
+.login-page .login-security .status-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: var(--green, #3fd6a4);
+  box-shadow: 0 0 11px rgba(63, 214, 164, 0.36);
+}
+
+.login-page .login-card {
+  width: 100%;
+  min-width: 0;
+  padding: clamp(24px, 4vw, 36px);
+  border: 1px solid var(--border, #223047);
+  border-radius: 20px;
+  background: rgba(17, 26, 42, 0.96);
+  box-shadow: var(--shadow, 0 18px 55px rgba(0, 0, 0, 0.22));
+}
+
+.login-page .login-card-head {
+  margin-bottom: 27px;
+}
+
+.login-page .login-card-head h2 {
+  margin-top: 10px;
+  color: var(--text, #f4f7fb);
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.25;
+}
+
+.login-page .login-card-head p {
+  margin-top: 8px;
+  color: var(--muted, #8090a6);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.login-page #login-form {
+  display: grid;
+  gap: 18px;
+}
+
+.login-page #login-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--text-soft, #c5cfde);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.login-page #login-form input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 47px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-light, #2b3b56);
+  border-radius: 10px;
+  outline: none;
+  color: var(--text, #f4f7fb);
+  background: #0b1220;
+  font-size: 13px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.login-page #login-form input::placeholder {
+  color: var(--muted-2, #5d6c82);
+  opacity: 1;
+}
+
+.login-page #login-form input:focus {
+  border-color: var(--primary, #4f8fff);
+  box-shadow: 0 0 0 3px rgba(79, 143, 255, 0.13);
+}
+
+.login-page #login-form .login-submit {
+  width: 100%;
+  min-height: 47px;
+  margin-top: 3px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.login-page #login-form .login-submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
+}
+
+.login-page .login-feedback {
+  margin: 0;
+  padding: 12px 13px;
+  border: 1px solid rgba(255, 127, 145, 0.3);
+  border-radius: 10px;
+  color: #ffb5c0;
+  background: rgba(255, 127, 145, 0.08);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.login-page .login-feedback[hidden] {
+  display: none !important;
+}
+
+.login-page .login-note {
+  margin-top: 22px;
+  padding-top: 17px;
+  border-top: 1px solid var(--border, #223047);
+  color: var(--muted, #8090a6);
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+/* Tablets e telas menores */
+@media (max-width: 760px) {
+  .login-page {
+    place-items: start center;
+    padding: 28px 18px;
+  }
+
+  .login-page .login-shell {
+    width: min(100%, 460px);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 25px;
+  }
+
+  .login-page .login-brand {
+    padding: 8px 2px 0;
+  }
+
+  .login-page .login-logo {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    font-size: 27px;
+  }
+
+  .login-page .login-brand h1 {
+    max-width: 460px;
+    font-size: clamp(29px, 7vw, 39px);
+    letter-spacing: -1.1px;
+  }
+
+  .login-page .login-brand > p {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  .login-page .login-security {
+    margin-top: 17px;
+  }
+
+  .login-page .login-card {
+    padding: 25px 22px;
+  }
+}
+
+/* Celulares pequenos */
+@media (max-width: 380px) {
+  .login-page {
+    padding: 20px 12px;
+  }
+
+  .login-page .login-shell {
+    gap: 20px;
+  }
+
+  .login-page .login-brand h1 {
+    font-size: 28px;
+  }
+
+  .login-page .login-card {
+    padding: 21px 17px;
+  }
+
+  .login-page .login-card-head h2 {
+    font-size: 24px;
+  }
+}
+
+/* Respeita preferência por movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  .login-page *,
+  .login-page *::before,
+  .login-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Responsividade dos formulários e cartões dos módulos */
 @media (max-width: 700px) {
   .form-grid,
   .stats-row {
@@ -317,4 +595,4 @@
     grid-column: auto;
   }
 }
-s
+```
