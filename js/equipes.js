@@ -2,11 +2,10 @@
 (() => {
   'use strict';
 
-  // Deve corresponder ao ID existente em equipes.html.
   const root = document.getElementById('crud-root');
 
   if (!root) {
-    console.error('Kaerb ERP: elemento #crud-root não encontrado em equipes.html.');
+    console.error('Kaerb ERP: elemento #crud-root não encontrado.');
     return;
   }
 
@@ -15,10 +14,11 @@
   let games = [];
   let players = [];
   let members = [];
-  let tab = 'teams';
+  let tab = 'players';
   let selected = '';
   let editTeam = null;
   let editMember = null;
+  let editPlayer = null;
   let initialized = false;
   let loading = false;
 
@@ -57,7 +57,7 @@
   function showError(message) {
     root.innerHTML = `
       <div class="notice notice-error">
-        <strong>Não foi possível carregar Equipes e jogadores.</strong>
+        <strong>Não foi possível carregar Jogadores e LINEs.</strong>
         <p>${esc(message)}</p>
         <button type="button" class="btn" id="retry-teams">
           Tentar novamente
@@ -65,17 +65,19 @@
       </div>
     `;
 
-    root.querySelector('#retry-teams').addEventListener('click', load);
+    root.querySelector('#retry-teams')
+      .addEventListener('click', load);
   }
 
   async function load() {
     if (!db || loading) return;
 
     loading = true;
+
     root.innerHTML = `
       <div class="loading-state">
         <span class="spinner"></span>
-        Carregando equipes e LINE...
+        Carregando jogadores e LINEs...
       </div>
     `;
 
@@ -101,15 +103,17 @@
 
       render();
     } catch (error) {
-      console.error('Kaerb ERP — erro ao carregar equipes:', error);
-      showError(error.message || 'Ocorreu um erro inesperado.');
+      console.error('Kaerb ERP — erro ao carregar:', error);
+      showError(error.message || 'Erro inesperado.');
     } finally {
       loading = false;
     }
   }
 
   function gameName(id) {
-    const game = games.find(item => String(item.id) === String(id));
+    const game = games.find(
+      item => String(item.id) === String(id)
+    );
 
     return game
       ? game.nome || game.nome_jogo || '—'
@@ -117,7 +121,9 @@
   }
 
   function playerName(id) {
-    const player = players.find(item => String(item.id) === String(id));
+    const player = players.find(
+      item => String(item.id) === String(id)
+    );
 
     return player
       ? player.apelido || player.nome_completo || 'Jogador'
@@ -129,18 +135,18 @@
       <div class="crud-tabs">
         <button
           type="button"
-          class="crud-tab ${tab === 'teams' ? 'active' : ''}"
-          data-tab="teams"
+          class="crud-tab ${tab === 'players' ? 'active' : ''}"
+          data-tab="players"
         >
-          Equipes
+          Jogadores
         </button>
 
         <button
           type="button"
-          class="crud-tab ${tab === 'line' ? 'active' : ''}"
-          data-tab="line"
+          class="crud-tab ${tab === 'lines' ? 'active' : ''}"
+          data-tab="lines"
         >
-          LINE / Escalações
+          LINEs
         </button>
       </div>
 
@@ -156,26 +162,311 @@
 
     const content = root.querySelector('#content');
 
-    if (tab === 'teams') {
-      renderTeams(content);
+    if (tab === 'players') {
+      renderPlayers(content);
     } else {
-      renderLine(content);
+      renderLines(content);
     }
   }
 
-  function renderTeams(content) {
+  // =====================================================
+  // JOGADORES — cadastro independente das LINEs
+  // =====================================================
+
+  function renderPlayers(content) {
     content.innerHTML = `
       <div class="crud-toolbar">
         <input
-          id="search-team"
+          id="search-player"
           class="field"
           type="search"
-          placeholder="Buscar equipe"
-          aria-label="Buscar equipe"
+          placeholder="Buscar jogador"
+          aria-label="Buscar jogador"
         >
 
-        <button type="button" id="new-team" class="btn btn-primary">
-          + Nova equipe
+        <button
+          type="button"
+          id="new-player"
+          class="btn btn-primary"
+        >
+          + Cadastrar jogador
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Apelido</th>
+              <th>Nome completo</th>
+              <th>Status</th>
+              <th>LINEs atuais</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${
+              players.length
+                ? players.map(player => {
+                    const activeLines = members.filter(member =>
+                      String(member.jogador_id) === String(player.id) &&
+                      member.ativo === true
+                    );
+
+                    return `
+                      <tr>
+                        <td>${esc(player.apelido || '—')}</td>
+                        <td>${esc(player.nome_completo || '—')}</td>
+                        <td>${esc(player.status || '—')}</td>
+                        <td>${activeLines.length}</td>
+                        <td class="row-actions">
+                          <button
+                            type="button"
+                            class="btn btn-small"
+                            data-edit-player="${esc(player.id)}"
+                          >
+                            Editar
+                          </button>
+
+                          <button
+                            type="button"
+                            class="btn btn-small btn-primary"
+                            data-player-line="${esc(player.id)}"
+                          >
+                            Vincular à LINE
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')
+                : `
+                  <tr>
+                    <td colspan="5" class="empty-cell">
+                      Nenhum jogador cadastrado.
+                    </td>
+                  </tr>
+                `
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div id="player-form-slot"></div>
+    `;
+
+    content.querySelector('#new-player')
+      .addEventListener('click', () => playerForm());
+
+    content.querySelector('#search-player')
+      .addEventListener('input', event => {
+        const query = event.target.value.toLowerCase();
+
+        content.querySelectorAll('tbody tr').forEach(row => {
+          row.hidden = !row.textContent.toLowerCase().includes(query);
+        });
+      });
+
+    content.querySelectorAll('[data-edit-player]')
+      .forEach(button => {
+        button.addEventListener('click', () => {
+          const player = players.find(
+            item => String(item.id) === button.dataset.editPlayer
+          );
+
+          if (player) playerForm(player);
+        });
+      });
+
+    content.querySelectorAll('[data-player-line]')
+      .forEach(button => {
+        button.addEventListener('click', () => {
+          const playerId = button.dataset.playerLine;
+
+          const existing = members.find(member =>
+            String(member.jogador_id) === String(playerId) &&
+            member.ativo === true
+          );
+
+          selected = existing?.equipe_id
+            ? String(existing.equipe_id)
+            : '';
+
+          tab = 'lines';
+          render();
+
+          const content = root.querySelector('#content');
+          const chooseTeam = content?.querySelector('#choose-team');
+
+          if (chooseTeam && selected) {
+            chooseTeam.value = selected;
+          }
+
+          if (chooseTeam) {
+            selected = chooseTeam.value;
+          }
+
+          render();
+
+          const slot = root.querySelector('#member-form-slot');
+
+          if (slot) {
+            memberForm({}, playerId);
+          }
+        });
+      });
+  }
+
+  function playerForm(player = {}) {
+    editPlayer = player.id ?? null;
+
+    const slot = root.querySelector('#player-form-slot');
+    if (!slot) return;
+
+    slot.innerHTML = `
+      <form class="crud-form" id="player-form">
+        <h2>${editPlayer ? 'Editar jogador' : 'Cadastrar jogador'}</h2>
+
+        <div class="form-grid">
+          <label>
+            Nome completo *
+            <input
+              class="field"
+              name="nome_completo"
+              required
+              value="${esc(player.nome_completo)}"
+            >
+          </label>
+
+          <label>
+            Apelido *
+            <input
+              class="field"
+              name="apelido"
+              required
+              value="${esc(player.apelido)}"
+            >
+          </label>
+
+          <label>
+            Status
+            <select class="field" name="status">
+              <option
+                value="ativo"
+                ${
+                  !player.status || player.status === 'ativo'
+                    ? 'selected'
+                    : ''
+                }
+              >
+                Ativo
+              </option>
+
+              <option
+                value="inativo"
+                ${player.status === 'inativo' ? 'selected' : ''}
+              >
+                Inativo
+              </option>
+            </select>
+          </label>
+        </div>
+
+        <p class="muted">
+          O cadastro do jogador é independente da LINE.
+          Depois de salvar, você poderá vinculá-lo a uma LINE.
+        </p>
+
+        <div class="form-actions">
+          <button type="button" class="btn" id="cancel-player">
+            Cancelar
+          </button>
+
+          <button type="submit" class="btn btn-primary">
+            Salvar jogador
+          </button>
+        </div>
+      </form>
+    `;
+
+    const form = slot.querySelector('#player-form');
+
+    slot.querySelector('#cancel-player')
+      .addEventListener('click', () => {
+        editPlayer = null;
+        slot.innerHTML = '';
+      });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+
+      const button = form.querySelector('[type="submit"]');
+      if (button.disabled) return;
+
+      button.disabled = true;
+
+      try {
+        const data = Object.fromEntries(
+          new FormData(form).entries()
+        );
+
+        const result = editPlayer
+          ? await db.from('jogadores')
+              .update(data)
+              .eq('id', editPlayer)
+          : await db.from('jogadores').insert(data);
+
+        if (result.error) {
+          notice(
+            'Erro ao salvar jogador: ' + result.error.message,
+            'error'
+          );
+          return;
+        }
+
+        editPlayer = null;
+        await load();
+        notice('Jogador salvo com sucesso.', 'success');
+      } catch (error) {
+        console.error(error);
+        notice('Erro inesperado ao salvar o jogador.', 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    slot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // =====================================================
+  // LINEs — a tabela equipes continua sendo usada no banco
+  // =====================================================
+
+  function renderLines(content) {
+    const choices = teams.filter(team => team.status !== 'encerrada');
+
+    if (!selected || !choices.some(
+      team => String(team.id) === String(selected)
+    )) {
+      selected = choices[0]?.id ? String(choices[0].id) : '';
+    }
+
+    content.innerHTML = `
+      <div class="crud-toolbar">
+        <input
+          id="search-line"
+          class="field"
+          type="search"
+          placeholder="Buscar LINE"
+          aria-label="Buscar LINE"
+        >
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="new-line"
+        >
+          + Nova LINE
         </button>
       </div>
 
@@ -205,15 +496,15 @@
                     </p>
 
                     <div class="team-card-meta">
-                      <span>LINE ativa</span>
-                      <strong>${activeMembers} jogador(es)</strong>
+                      <span>Jogadores ativos</span>
+                      <strong>${activeMembers}</strong>
                     </div>
 
                     <div class="form-actions">
                       <button
                         type="button"
                         class="btn btn-small"
-                        data-edit="${esc(team.id)}"
+                        data-edit-line="${esc(team.id)}"
                       >
                         Editar
                       </button>
@@ -221,7 +512,7 @@
                       <button
                         type="button"
                         class="btn btn-primary btn-small"
-                        data-line="${esc(team.id)}"
+                        data-manage-line="${esc(team.id)}"
                       >
                         Gerenciar LINE
                       </button>
@@ -229,57 +520,65 @@
                   </article>
                 `;
               }).join('')
-            : '<p>Nenhuma equipe cadastrada.</p>'
+            : '<p>Nenhuma LINE cadastrada.</p>'
         }
       </div>
 
-      <div id="team-form-slot"></div>
+      <div id="line-form-slot"></div>
+      <div id="line-members-slot"></div>
     `;
 
-    content.querySelector('#new-team').addEventListener('click', () => {
-      teamForm();
-    });
+    content.querySelector('#new-line')
+      .addEventListener('click', () => lineForm());
 
-    content.querySelector('#search-team').addEventListener('input', event => {
-      const query = event.target.value.toLowerCase();
+    content.querySelector('#search-line')
+      .addEventListener('input', event => {
+        const query = event.target.value.toLowerCase();
 
-      content.querySelectorAll('.team-card').forEach(card => {
-        card.hidden = !card.textContent.toLowerCase().includes(query);
+        content.querySelectorAll('.team-card').forEach(card => {
+          card.hidden = !card.textContent.toLowerCase().includes(query);
+        });
       });
-    });
 
-    content.querySelectorAll('[data-edit]').forEach(button => {
-      button.addEventListener('click', () => {
-        const team = teams.find(
-          item => String(item.id) === button.dataset.edit
-        );
+    content.querySelectorAll('[data-edit-line]')
+      .forEach(button => {
+        button.addEventListener('click', () => {
+          const team = teams.find(
+            item => String(item.id) === button.dataset.editLine
+          );
 
-        if (team) teamForm(team);
+          if (team) lineForm(team);
+        });
       });
-    });
 
-    content.querySelectorAll('[data-line]').forEach(button => {
-      button.addEventListener('click', () => {
-        selected = button.dataset.line;
-        tab = 'line';
-        render();
+    content.querySelectorAll('[data-manage-line]')
+      .forEach(button => {
+        button.addEventListener('click', () => {
+          selected = button.dataset.manageLine;
+          renderLineMembers(content);
+        });
       });
-    });
+
+    if (selected && choices.some(
+      team => String(team.id) === String(selected)
+    )) {
+      renderLineMembers(content);
+    }
   }
 
-  function teamForm(team = {}) {
+  function lineForm(team = {}) {
     editTeam = team.id ?? null;
 
-    const slot = root.querySelector('#team-form-slot');
+    const slot = root.querySelector('#line-form-slot');
     if (!slot) return;
 
     slot.innerHTML = `
-      <form class="crud-form" id="team-form">
-        <h2>${editTeam ? 'Editar equipe' : 'Nova equipe'}</h2>
+      <form class="crud-form" id="line-form">
+        <h2>${editTeam ? 'Editar LINE' : 'Cadastrar LINE'}</h2>
 
         <div class="form-grid">
           <label>
-            Nome da equipe *
+            Nome da LINE *
             <input
               class="field"
               name="nome"
@@ -321,30 +620,17 @@
           <label>
             Status
             <select class="field" name="status">
-              <option
-                value="ativa"
-                ${
-                  !team.status || team.status === 'ativa'
-                    ? 'selected'
-                    : ''
-                }
-              >
-                Ativa
-              </option>
+              <option value="ativa" ${
+                !team.status || team.status === 'ativa' ? 'selected' : ''
+              }>Ativa</option>
 
-              <option
-                value="inativa"
-                ${team.status === 'inativa' ? 'selected' : ''}
-              >
-                Inativa
-              </option>
+              <option value="inativa" ${
+                team.status === 'inativa' ? 'selected' : ''
+              }>Inativa</option>
 
-              <option
-                value="encerrada"
-                ${team.status === 'encerrada' ? 'selected' : ''}
-              >
-                Encerrada
-              </option>
+              <option value="encerrada" ${
+                team.status === 'encerrada' ? 'selected' : ''
+              }>Encerrada</option>
             </select>
           </label>
 
@@ -355,23 +641,24 @@
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn" id="cancel-team">
+          <button type="button" class="btn" id="cancel-line">
             Cancelar
           </button>
 
           <button type="submit" class="btn btn-primary">
-            Salvar equipe
+            Salvar LINE
           </button>
         </div>
       </form>
     `;
 
-    const form = slot.querySelector('#team-form');
+    const form = slot.querySelector('#line-form');
 
-    slot.querySelector('#cancel-team').addEventListener('click', () => {
-      editTeam = null;
-      slot.innerHTML = '';
-    });
+    slot.querySelector('#cancel-line')
+      .addEventListener('click', () => {
+        editTeam = null;
+        slot.innerHTML = '';
+      });
 
     form.addEventListener('submit', async event => {
       event.preventDefault();
@@ -382,7 +669,9 @@
       button.disabled = true;
 
       try {
-        const data = Object.fromEntries(new FormData(form).entries());
+        const data = Object.fromEntries(
+          new FormData(form).entries()
+        );
 
         data.jogo_id ||= null;
         data.atualizado_em = new Date().toISOString();
@@ -395,16 +684,21 @@
             });
 
         if (result.error) {
-          notice('Erro ao salvar equipe: ' + result.error.message, 'error');
+          notice(
+            'Erro ao salvar LINE: ' + result.error.message,
+            'error'
+          );
           return;
         }
 
         editTeam = null;
         await load();
-        notice('Equipe salva com sucesso.', 'success');
+        tab = 'lines';
+        render();
+        notice('LINE salva com sucesso.', 'success');
       } catch (error) {
         console.error(error);
-        notice('Erro inesperado ao salvar a equipe.', 'error');
+        notice('Erro inesperado ao salvar a LINE.', 'error');
       } finally {
         button.disabled = false;
       }
@@ -413,155 +707,136 @@
     slot.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function renderLine(content) {
-    const choices = teams.filter(team => team.status !== 'encerrada');
+  // =====================================================
+  // VÍNCULO ENTRE JOGADORES E LINEs
+  // =====================================================
 
-    if (!selected || !choices.some(team => String(team.id) === String(selected))) {
-      selected = choices[0]?.id || '';
+  function renderLineMembers(content) {
+    const team = teams.find(
+      item => String(item.id) === String(selected)
+    );
+
+    if (!team) {
+      notice('Selecione uma LINE válida.', 'error');
+      return;
     }
 
     const rows = members.filter(
       member => String(member.equipe_id) === String(selected)
     );
 
-    content.innerHTML = `
-      <div class="crud-toolbar">
-        <label>
-          Equipe
+    let slot = content.querySelector('#line-members-slot');
 
-          <select id="choose-team" class="field">
-            ${
-              choices.map(team => `
-                <option
-                  value="${esc(team.id)}"
-                  ${
-                    String(team.id) === String(selected)
-                      ? 'selected'
-                      : ''
-                  }
-                >
-                  ${esc(team.nome)}
-                </option>
-              `).join('')
-            }
-          </select>
-        </label>
+    if (!slot) {
+      slot = document.createElement('div');
+      slot.id = 'line-members-slot';
+      content.appendChild(slot);
+    }
 
-        <button
-          type="button"
-          class="btn btn-primary"
-          id="add-member"
-          ${selected ? '' : 'disabled'}
-        >
-          + Adicionar jogador à LINE
-        </button>
-      </div>
+    slot.innerHTML = `
+      <div class="crud-form">
+        <h2>LINE: ${esc(team.nome)}</h2>
 
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Jogador</th>
-              <th>Função</th>
-              <th>Entrada</th>
-              <th>Saída</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
+        <div class="crud-toolbar">
+          <span>Elenco e histórico de participações</span>
 
-          <tbody>
-            ${
-              rows.length
-                ? rows.map(member => `
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="add-member"
+          >
+            + Vincular jogador
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Jogador</th>
+                <th>Função</th>
+                <th>Entrada</th>
+                <th>Saída</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${
+                rows.length
+                  ? rows.map(member => `
+                      <tr>
+                        <td>${esc(playerName(member.jogador_id))}</td>
+                        <td>${esc(member.funcao || '—')}</td>
+                        <td>${esc(member.data_inicio || '—')}</td>
+                        <td>${esc(member.data_fim || '—')}</td>
+                        <td>${member.ativo ? 'Ativo' : 'Encerrado'}</td>
+                        <td class="row-actions">
+                          <button
+                            type="button"
+                            class="btn btn-small"
+                            data-edit-member="${esc(member.id)}"
+                          >
+                            Editar
+                          </button>
+
+                          ${
+                            member.ativo
+                              ? `<button type="button" class="btn btn-small btn-danger" data-end="${esc(member.id)}">Encerrar</button>`
+                              : `<button type="button" class="btn btn-small" data-reactivate="${esc(member.id)}">Reativar</button>`
+                          }
+                        </td>
+                      </tr>
+                    `).join('')
+                  : `
                     <tr>
-                      <td>${esc(playerName(member.jogador_id))}</td>
-                      <td>${esc(member.funcao || '—')}</td>
-                      <td>${esc(member.data_inicio || '—')}</td>
-                      <td>${esc(member.data_fim || '—')}</td>
-                      <td>${member.ativo ? 'Ativo' : 'Encerrado'}</td>
-
-                      <td class="row-actions">
-                        <button
-                          type="button"
-                          class="btn btn-small"
-                          data-edit-member="${esc(member.id)}"
-                        >
-                          Editar
-                        </button>
-
-                        ${
-                          member.ativo
-                            ? `
-                              <button
-                                type="button"
-                                class="btn btn-small btn-danger"
-                                data-end="${esc(member.id)}"
-                              >
-                                Encerrar
-                              </button>
-                            `
-                            : `
-                              <button
-                                type="button"
-                                class="btn btn-small"
-                                data-reactivate="${esc(member.id)}"
-                              >
-                                Reativar
-                              </button>
-                            `
-                        }
+                      <td colspan="6" class="empty-cell">
+                        Nenhum jogador vinculado a esta LINE.
                       </td>
                     </tr>
-                  `).join('')
-                : `
-                  <tr>
-                    <td colspan="6" class="empty-cell">
-                      Nenhuma participação registrada nesta equipe.
-                    </td>
-                  </tr>
-                `
-            }
-          </tbody>
-        </table>
-      </div>
+                  `
+              }
+            </tbody>
+          </table>
+        </div>
 
-      <div id="member-form-slot"></div>
+        <div id="member-form-slot"></div>
+      </div>
     `;
 
-    content.querySelector('#choose-team').addEventListener('change', event => {
-      selected = event.target.value;
-      render();
-    });
+    slot.querySelector('#add-member')
+      .addEventListener('click', () => memberForm());
 
-    content.querySelector('#add-member').addEventListener('click', () => {
-      memberForm();
-    });
+    slot.querySelectorAll('[data-edit-member]')
+      .forEach(button => {
+        button.addEventListener('click', () => {
+          const member = members.find(
+            item => String(item.id) === button.dataset.editMember
+          );
 
-    content.querySelectorAll('[data-edit-member]').forEach(button => {
-      button.addEventListener('click', () => {
-        const member = members.find(
-          item => String(item.id) === button.dataset.editMember
-        );
-
-        if (member) memberForm(member);
+          if (member) memberForm(member);
+        });
       });
-    });
 
-    content.querySelectorAll('[data-end]').forEach(button => {
-      button.addEventListener('click', () => {
-        toggleMember(button.dataset.end, false);
+    slot.querySelectorAll('[data-end]')
+      .forEach(button => {
+        button.addEventListener('click', () => {
+          toggleMember(button.dataset.end, false);
+        });
       });
-    });
 
-    content.querySelectorAll('[data-reactivate]').forEach(button => {
-      button.addEventListener('click', () => {
-        toggleMember(button.dataset.reactivate, true);
+    slot.querySelectorAll('[data-reactivate]')
+      .forEach(button => {
+        button.addEventListener('click', () => {
+          toggleMember(button.dataset.reactivate, true);
+        });
       });
-    });
+
+    slot.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function memberForm(member = {}) {
+  function memberForm(member = {}, presetPlayerId = '') {
     editMember = member.id ?? null;
 
     const slot = root.querySelector('#member-form-slot');
@@ -571,22 +846,22 @@
 
     slot.innerHTML = `
       <form class="crud-form" id="member-form">
-        <h2>${editMember ? 'Editar participação' : 'Adicionar à LINE'}</h2>
+        <h3>${editMember ? 'Editar participação' : 'Vincular jogador à LINE'}</h3>
 
         <div class="form-grid">
           <label>
             Jogador *
             <select class="field" name="jogador_id" required>
-              <option value="">Selecione</option>
+              <option value="">Selecione um jogador cadastrado</option>
 
               ${players.filter(player =>
                 player.status === 'ativo' ||
-                String(player.id) === String(member.jogador_id)
+                String(player.id) === String(member.jogador_id || presetPlayerId)
               ).map(player => `
                 <option
                   value="${esc(player.id)}"
                   ${
-                    String(player.id) === String(member.jogador_id)
+                    String(player.id) === String(member.jogador_id || presetPlayerId)
                       ? 'selected'
                       : ''
                   }
@@ -628,35 +903,24 @@
               value="${esc(member.data_fim)}"
               min="${esc(startDate)}"
             >
-
-            <span class="field-hint">
-              A data de saída não pode ser anterior à data de entrada.
-              Se o jogador ainda estiver na LINE, deixe este campo vazio.
-            </span>
           </label>
 
           <label>
             Status
             <select class="field" name="ativo">
-              <option
-                value="true"
-                ${member.ativo !== false ? 'selected' : ''}
-              >
-                Ativo
-              </option>
+              <option value="true" ${
+                member.ativo !== false ? 'selected' : ''
+              }>Ativo</option>
 
-              <option
-                value="false"
-                ${member.ativo === false ? 'selected' : ''}
-              >
-                Encerrado
-              </option>
+              <option value="false" ${
+                member.ativo === false ? 'selected' : ''
+              }>Encerrado</option>
             </select>
           </label>
         </div>
 
         <p class="muted">
-          Encerrar uma participação preserva o histórico e não apaga o jogador.
+          O jogador continua cadastrado mesmo se sair da LINE.
         </p>
 
         <div class="form-actions">
@@ -665,7 +929,7 @@
           </button>
 
           <button type="submit" class="btn btn-primary">
-            Salvar participação
+            Salvar vínculo
           </button>
         </div>
       </form>
@@ -678,22 +942,21 @@
     function validateDates() {
       endInput.min = startInput.value;
 
-      if (endInput.value && endInput.value < startInput.value) {
-        endInput.setCustomValidity(
-          'A data de saída não pode ser anterior à data de entrada.'
-        );
-      } else {
-        endInput.setCustomValidity('');
-      }
+      endInput.setCustomValidity(
+        endInput.value && endInput.value < startInput.value
+          ? 'A data de saída não pode ser anterior à data de entrada.'
+          : ''
+      );
     }
 
     startInput.addEventListener('change', validateDates);
     endInput.addEventListener('change', validateDates);
 
-    slot.querySelector('#cancel-member').addEventListener('click', () => {
-      editMember = null;
-      slot.innerHTML = '';
-    });
+    slot.querySelector('#cancel-member')
+      .addEventListener('click', () => {
+        editMember = null;
+        slot.innerHTML = '';
+      });
 
     form.addEventListener('submit', async event => {
       event.preventDefault();
@@ -701,33 +964,19 @@
       const button = form.querySelector('[type="submit"]');
       if (button.disabled) return;
 
-      const start = startInput.value;
-      const end = endInput.value;
+      validateDates();
 
-      if (!start) {
-        notice('Informe a data de entrada na equipe.', 'error');
-        startInput.focus();
-        return;
-      }
+      if (!form.reportValidity()) return;
 
-      if (end && end < start) {
-        notice(
-          'A data de saída não pode ser anterior à data de entrada.',
-          'error'
-        );
-        endInput.focus();
-        return;
-      }
-
-      const data = Object.fromEntries(new FormData(form).entries());
+      const data = Object.fromEntries(
+        new FormData(form).entries()
+      );
 
       data.equipe_id = selected;
       data.ativo = data.ativo === 'true';
       data.data_fim ||= null;
 
-      if (data.ativo) {
-        data.data_fim = null;
-      }
+      if (data.ativo) data.data_fim = null;
 
       const duplicate = data.ativo && members.some(item =>
         item.ativo === true &&
@@ -738,7 +987,7 @@
 
       if (duplicate) {
         notice(
-          'Esse jogador já está ativo nesta LINE. Edite a participação existente.',
+          'Este jogador já está ativo nesta LINE.',
           'error'
         );
         return;
@@ -755,7 +1004,7 @@
 
         if (result.error) {
           notice(
-            'Erro ao salvar participação: ' + result.error.message,
+            'Erro ao salvar vínculo: ' + result.error.message,
             'error'
           );
           return;
@@ -764,12 +1013,16 @@
         editMember = null;
         await load();
 
-        tab = 'line';
+        tab = 'lines';
         render();
-        notice('LINE atualizada com sucesso.', 'success');
+
+        const content = root.querySelector('#content');
+        if (content) renderLineMembers(content);
+
+        notice('Vínculo salvo com sucesso.', 'success');
       } catch (error) {
         console.error(error);
-        notice('Erro inesperado ao salvar a participação.', 'error');
+        notice('Erro inesperado ao salvar o vínculo.', 'error');
       } finally {
         button.disabled = false;
       }
@@ -787,34 +1040,29 @@
 
     if (!confirmed) return;
 
-    const member = members.find(item => String(item.id) === String(id));
+    const member = members.find(
+      item => String(item.id) === String(id)
+    );
 
     if (!member) {
       notice('Participação não encontrada. Atualize a página.', 'error');
       return;
     }
 
-    if (
-      active &&
-      members.some(item =>
-        item.ativo === true &&
-        String(item.equipe_id) === String(member.equipe_id) &&
-        String(item.jogador_id) === String(member.jogador_id) &&
-        String(item.id) !== String(member.id)
-      )
-    ) {
+    if (active && members.some(item =>
+      item.ativo === true &&
+      String(item.equipe_id) === String(member.equipe_id) &&
+      String(item.jogador_id) === String(member.jogador_id) &&
+      String(item.id) !== String(member.id)
+    )) {
       notice(
-        'Já existe uma participação ativa desse jogador nesta equipe.',
+        'Este jogador já possui uma participação ativa nesta LINE.',
         'error'
       );
       return;
     }
 
-    if (
-      !active &&
-      member.data_inicio &&
-      today() < member.data_inicio
-    ) {
+    if (!active && member.data_inicio && today() < member.data_inicio) {
       notice(
         'A data de encerramento não pode ser anterior à data de entrada.',
         'error'
@@ -833,24 +1081,25 @@
         .eq('id', id);
 
       if (error) {
-        notice('Erro ao atualizar LINE: ' + error.message, 'error');
+        notice('Erro ao atualizar participação: ' + error.message, 'error');
         return;
       }
 
       await load();
 
-      tab = 'line';
+      tab = 'lines';
       render();
 
+      const content = root.querySelector('#content');
+      if (content) renderLineMembers(content);
+
       notice(
-        active
-          ? 'Participação reativada.'
-          : 'Participação encerrada; histórico preservado.',
+        active ? 'Participação reativada.' : 'Participação encerrada.',
         'success'
       );
     } catch (error) {
       console.error(error);
-      notice('Erro inesperado ao atualizar a LINE.', 'error');
+      notice('Erro inesperado ao atualizar a participação.', 'error');
     }
   }
 
@@ -870,16 +1119,17 @@
     load();
   }
 
-  // O app.js dispara este evento depois de validar a sessão.
   document.addEventListener('kaerb:ready', init);
 
-  // Compatibilidade caso a promessa de sessão já esteja disponível.
-  if (window.kaerbReady && typeof window.kaerbReady.then === 'function') {
-    window.kaerbReady.then(isReady => {
-      if (isReady) init();
-    }).catch(error => {
-      console.error('Kaerb ERP — erro ao validar sessão:', error);
-      showError('Não foi possível validar a sessão. Entre novamente no sistema.');
-    });
+  if (window.kaerbReady &&
+      typeof window.kaerbReady.then === 'function') {
+    window.kaerbReady
+      .then(isReady => {
+        if (isReady) init();
+      })
+      .catch(error => {
+        console.error('Kaerb ERP — erro ao validar sessão:', error);
+        showError('Não foi possível validar a sessão. Entre novamente.');
+      });
   }
 })();
