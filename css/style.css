@@ -263,10 +263,7 @@ body { background: var(--bg); }
 .button-primary { background: #c5962d; box-shadow: none; }
 .button-primary:hover { background: #d6a437; transform: none; }
 .panel, .metric-card { box-shadow: none; }
-```css
-/* CSS complementar do Kaerb ERP.
-   Mantém os estilos dos módulos e adiciona o login responsivo.
-   O css/style.css principal permanece separado. */
+/* Estilos dos módulos do Kaerb ERP e login responsivo. */
 
 .crud-tabs,
 .crud-toolbar,
@@ -860,7 +857,6 @@ body { background: var(--bg); }
     grid-column: auto;
   }
 }
-```
 
 
 /* ==========================================
@@ -888,7 +884,7 @@ body { background: var(--bg); }
   border: 0;
   border-radius: 12px;
   color: #071a2e;
-  background: linear-gradient(145deg, #a66cff 0%, #7b42eb 100%);
+  background: #ffffff;
   box-shadow: 0 10px 28px rgba(214, 164, 55, .18);
 }
 .login-page .login-logo svg { width: 25px; height: 25px; }
@@ -974,3 +970,32 @@ body { background: var(--bg); }
   object-fit: contain;
 }
 .login-logo img { width: 78%; height: 78%; }
+
+/* Ajuste de marca: a imagem ocupa o bloco sem ser comprimida */
+.brand-mark {
+  overflow: hidden;
+  padding: 0;
+  background: #ffffff;
+  border: 1px solid #d6a437;
+}
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.login-page .login-logo {
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  padding: 0;
+  background: #ffffff;
+  border: 2px solid #d6a437;
+}
+.login-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.hero-card {
+  background: #102f4c;
+}
