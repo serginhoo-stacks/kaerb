@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071a2e" />
+  <title>Kaerb Esports | Suporte</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="icon" type="image/png" href="./imagens/favicon.png" />
+</head>
+<body data-page="suporte">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="./dashboard.html" aria-label="Ir para o dashboard Kaerb"><span class="brand-mark"><img src="./imagens/logo.png" alt="Kaerb Esports" /></span><span><h1>KAERB</h1><span>ESPORTS MANAGEMENT</span></span></a>
+      <div class="menu-label">MENU PRINCIPAL</div>
+      <nav class="navigation" aria-label="Menu principal">
+        <a class="nav-link" href="./dashboard.html" data-active-page="dashboard"><span>▦</span>Dashboard</a>
+        <a class="nav-link" href="./equipes.html" data-active-page="equipes"><span>♙</span>Equipes e jogadores</a>
+        <a class="nav-link" href="./financeiro.html" data-active-page="financeiro"><span>▤</span>Financeiro</a>
+        <a class="nav-link" href="./campeonatos.html" data-active-page="campeonatos"><span>♜</span>Campeonatos</a>
+      </nav>
+      <div class="menu-label settings-label">ADMINISTRAÇÃO</div>
+      <nav class="navigation" aria-label="Administração">
+        <a class="nav-link" href="./historico.html" data-active-page="historico"><span>◷</span>Histórico de ações</a>
+        <a class="nav-link" href="./suporte.html" data-active-page="suporte"><span>?</span>Suporte</a>
+      </nav>
+      <div class="sidebar-footer"><span class="status-dot"></span><div><strong>Kaerb Esports</strong><span>Organize hoje. Vença amanhã.</span></div></div>
+    </aside>
+
+    <div class="app-main">
+      <header class="topbar"><div class="topbar-left"><span class="eyebrow">KAERB ESPORTS / ERP</span><span class="breadcrumb" data-breadcrumb>Suporte</span></div><div class="topbar-actions"><button class="icon-button" type="button" data-logout aria-label="Sair">↪</button><div class="user-area"><span class="user-avatar">K</span><div class="user-info"><strong>Administrador</strong><span>Carregando sessão...</span></div></div></div></header>
+      <main class="page-content">
+        <div class="page-intro"><div><span class="eyebrow">ATENDIMENTO</span><h2 data-page-title>Suporte</h2><p data-page-description>Abra uma solicitação e acompanhe a resposta da equipe Kaerb.</p></div><span class="date-chip" data-current-date>Carregando data...</span></div>
+        <div id="support-root"><div class="loading-state"><span class="spinner"></span>Carregando suporte...</div></div>
+        <footer class="page-footer"><span>KAERB ESPORTS © <span data-current-year></span></span><span>Atendimento e dúvidas</span><span>Desenvolvido por Sérginn</span></footer>
+      </main>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/supabase-config.js" defer></script>
+  <script src="./js/supabase-client.js" defer></script>
+  <script src="./js/app.js" defer></script>
+  <script src="./js/suporte.js" defer></script>
+</body>
+</html>
