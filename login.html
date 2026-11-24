@@ -1,10 +1,78 @@
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="theme-color" content="#080c14" /><title>Kaerb Esports | Acesso administrativo</title><link rel="stylesheet" href="./css/style.css" /><link rel="stylesheet" href="./css/crud-extra.css" /></head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071a2e" />
+  <title>Kaerb Esports | Acesso administrativo</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
 <body data-page="login" class="login-page">
   <main class="login-shell">
-    <section class="login-brand"><div class="login-logo">K</div><span class="eyebrow">KAERB ESPORTS / ERP</span><h1>Gestão competitiva com mais clareza.</h1><p>Acesse o ambiente administrativo da Kaerb Esports com a sua conta autorizada.</p><div class="login-security"><span class="status-dot"></span><span>Acesso protegido por Supabase Auth e RLS</span></div></section>
-    <section class="login-card"><div class="login-card-head"><span class="eyebrow">ÁREA RESTRITA</span><h2>Entrar no ERP</h2><p>Use uma das contas de proprietário cadastradas.</p></div><form id="login-form"><label>E-mail<input id="login-email" type="email" autocomplete="username" required placeholder="seu@email.com" /></label><label>Senha<input id="login-password" type="password" autocomplete="current-password" required placeholder="••••••••" /></label><button class="button button-primary login-submit" type="submit">Entrar no sistema</button><p id="login-feedback" class="login-feedback" role="alert" hidden></p></form><p class="login-note">Não compartilhe credenciais. Usuários não autorizados não devem conseguir consultar ou alterar os dados.</p></section>
+    <div class="login-hero" aria-hidden="true">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10 7.25V5.5a2 2 0 0 1 2-2h5.5a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2v-1.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M3.5 12h10m0 0-3.25-3.25M13.5 12l-3.25 3.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+    </div>
+
+    <header class="login-heading">
+      <h1>Bem-vindo de volta</h1>
+      <p>Entre na sua conta</p>
+    </header>
+
+    <section class="login-card" aria-labelledby="login-title">
+      <button class="social-login" id="google-login" type="button" aria-label="Continuar com Google">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#4285F4" d="M21.35 12.27c0-.73-.07-1.43-.2-2.1H12v3.98h5.24a4.48 4.48 0 0 1-1.94 2.94v2.44h3.14c1.84-1.69 2.91-4.18 2.91-7.26Z" />
+          <path fill="#34A853" d="M12 21.75c2.64 0 4.85-.87 6.47-2.36l-3.14-2.44c-.87.58-1.98.92-3.33.92-2.56 0-4.73-1.73-5.51-4.05H3.25v2.52A9.77 9.77 0 0 0 12 21.75Z" />
+          <path fill="#FBBC05" d="M6.49 13.82A5.87 5.87 0 0 1 6.18 12c0-.63.11-1.25.31-1.82V7.66H3.25A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.06 1 4.34l3.24-2.52Z" />
+          <path fill="#EA4335" d="M12 6.13c1.44 0 2.73.5 3.75 1.48l2.81-2.81C16.84 3.21 14.64 2.25 12 2.25a9.77 9.77 0 0 0-8.75 5.41l3.24 2.52C7.27 7.86 9.44 6.13 12 6.13Z" />
+        </svg>
+        <span>Continuar com Google</span>
+      </button>
+
+      <div class="login-divider" role="presentation"><span></span><em>ou</em><span></span></div>
+
+      <div class="login-card-head">
+        <span class="eyebrow">ÁREA RESTRITA</span>
+        <h2 id="login-title">Acesse o painel</h2>
+        <p>Use suas credenciais autorizadas para continuar.</p>
+      </div>
+
+      <form id="login-form">
+        <label for="login-email">E-mail
+          <span class="input-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.6" /><path d="m4.5 7 7.5 5.5L19.5 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <input id="login-email" type="email" autocomplete="username" required placeholder="voce@exemplo.com" />
+          </span>
+        </label>
+
+        <label for="login-password">Senha
+          <span class="input-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2" stroke="currentColor" stroke-width="1.6" /><path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+            <input id="login-password" type="password" autocomplete="current-password" required placeholder="••••••••" />
+          </span>
+        </label>
+
+        <div class="login-options">
+          <span></span>
+          <button id="forgot-password" type="button">Esqueceu a senha?</button>
+        </div>
+
+        <button class="button button-primary login-submit" type="submit">Entrar</button>
+        <p id="login-feedback" class="login-feedback" role="alert" hidden></p>
+      </form>
+
+      <p class="login-create">Ainda não tem uma conta? <span>Fale com o administrador</span></p>
+    </section>
   </main>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./js/supabase-config.js"></script><script src="./js/supabase-client.js"></script><script src="./js/login.js"></script>
-</body></html>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/supabase-config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/login.js"></script>
+</body>
+</html>
