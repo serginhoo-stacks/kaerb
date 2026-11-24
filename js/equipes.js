@@ -236,6 +236,14 @@
                           >
                             Vincular à Line
                           </button>
+
+                          <button
+                            type="button"
+                            class="btn btn-small btn-danger"
+                            data-delete-player="${esc(player.id)}"
+                          >
+                            Excluir
+                          </button>
                         </td>
                       </tr>
                     `;
@@ -315,6 +323,53 @@
           }
         });
       });
+
+    content.querySelectorAll('[data-delete-player]')
+      .forEach(button => {
+        button.addEventListener('click', () => {
+          deletePlayer(button.dataset.deletePlayer);
+        });
+      });
+  }
+
+  async function deletePlayer(id) {
+    const player = players.find(item => String(item.id) === String(id));
+
+    if (!player) {
+      notice('Jogador não encontrado. Atualize a página e tente novamente.', 'error');
+      return;
+    }
+
+    const hasHistory = members.some(member =>
+      String(member.jogador_id) === String(id)
+    );
+
+    if (hasHistory) {
+      notice(
+        'Este jogador possui vínculo atual ou histórico com uma Line. Encerre o vínculo antes de excluir o cadastro.',
+        'error'
+      );
+      return;
+    }
+
+    const confirmed = confirm(
+      `Deseja excluir definitivamente o jogador ${player.nome_completo || player.apelido || ''}?`
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await db
+      .from('jogadores')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      notice('Erro ao excluir jogador: ' + error.message, 'error');
+      return;
+    }
+
+    await load();
+    notice('Jogador excluído com sucesso.', 'success');
   }
 
   function playerForm(player = {}) {
