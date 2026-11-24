@@ -1027,3 +1027,10 @@ body { background: var(--bg); }
   text-transform: uppercase;
 }
 .form-section-title:first-child { margin-top: 0; }
+
+/* Não exibir módulos removidos mesmo em HTMLs antigos em cache */
+.sidebar a[href="./contratos.html"],
+.sidebar a[href="./patrocinadores.html"],
+.sidebar a[href="./departamentos.html"] {
+  display: none !important;
+}
