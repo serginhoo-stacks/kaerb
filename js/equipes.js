@@ -57,7 +57,7 @@
   function showError(message) {
     root.innerHTML = `
       <div class="notice notice-error">
-        <strong>Não foi possível carregar Jogadores e LINEs.</strong>
+        <strong>Não foi possível carregar Jogadores e Lines.</strong>
         <p>${esc(message)}</p>
         <button type="button" class="btn" id="retry-teams">
           Tentar novamente
@@ -77,7 +77,7 @@
     root.innerHTML = `
       <div class="loading-state">
         <span class="spinner"></span>
-        Carregando jogadores e LINEs...
+        Carregando jogadores e Lines...
       </div>
     `;
 
@@ -146,7 +146,7 @@
           class="crud-tab ${tab === 'lines' ? 'active' : ''}"
           data-tab="lines"
         >
-          LINEs
+          Lines
         </button>
       </div>
 
@@ -170,7 +170,7 @@
   }
 
   // =====================================================
-  // JOGADORES — cadastro independente das LINEs
+  // JOGADORES — cadastro independente das Lines
   // =====================================================
 
   function renderPlayers(content) {
@@ -200,7 +200,7 @@
               <th>Apelido</th>
               <th>Nome completo</th>
               <th>Status</th>
-              <th>LINEs atuais</th>
+              <th>Lines atuais</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -234,7 +234,7 @@
                             class="btn btn-small btn-primary"
                             data-player-line="${esc(player.id)}"
                           >
-                            Vincular à LINE
+                            Vincular à Line
                           </button>
                         </td>
                       </tr>
@@ -323,104 +323,164 @@
     const slot = root.querySelector('#player-form-slot');
     if (!slot) return;
 
+    const participated = player.participou_outra_guilda === true || player.participou_outra_guilda === 'true';
+
     slot.innerHTML = `
       <form class="crud-form" id="player-form">
         <h2>${editPlayer ? 'Editar jogador' : 'Cadastrar jogador'}</h2>
 
+        <h3 class="form-section-title">Dados pessoais</h3>
         <div class="form-grid">
           <label>
             Nome completo *
-            <input
-              class="field"
-              name="nome_completo"
-              required
-              value="${esc(player.nome_completo)}"
-            >
+            <input class="field" name="nome_completo" required value="${esc(player.nome_completo)}">
           </label>
 
           <label>
-            Apelido *
-            <input
-              class="field"
-              name="apelido"
-              required
-              value="${esc(player.apelido)}"
-            >
+            Nick no Free Fire *
+            <input class="field" name="apelido" required value="${esc(player.apelido)}">
+          </label>
+
+          <label>
+            Idade
+            <input class="field" type="number" name="idade" min="0" max="120" value="${esc(player.idade)}">
+          </label>
+
+          <label>
+            Data de nascimento
+            <input class="field" type="date" name="data_nascimento" value="${esc(player.data_nascimento)}">
+          </label>
+
+          <label>
+            ID do Free Fire
+            <input class="field" name="id_free_fire" inputmode="numeric" value="${esc(player.id_free_fire)}">
+          </label>
+
+          <label>
+            Número de celular
+            <input class="field" type="tel" name="numero_celular" value="${esc(player.numero_celular)}">
+          </label>
+
+          <label>
+            Cidade onde mora
+            <input class="field" name="cidade" value="${esc(player.cidade)}">
+          </label>
+
+          <label>
+            Estado
+            <input class="field" name="estado" maxlength="2" placeholder="UF" value="${esc(player.estado)}">
+          </label>
+
+          <label>
+            Instagram (opcional)
+            <input class="field" name="instagram" placeholder="@usuario" value="${esc(player.instagram)}">
           </label>
 
           <label>
             Status
             <select class="field" name="status">
-              <option
-                value="ativo"
-                ${
-                  !player.status || player.status === 'ativo'
-                    ? 'selected'
-                    : ''
-                }
-              >
-                Ativo
-              </option>
-
-              <option
-                value="inativo"
-                ${player.status === 'inativo' ? 'selected' : ''}
-              >
-                Inativo
-              </option>
+              <option value="ativo" ${!player.status || player.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+              <option value="inativo" ${player.status === 'inativo' ? 'selected' : ''}>Inativo</option>
             </select>
           </label>
         </div>
 
-        <p class="muted">
-          O cadastro do jogador é independente da LINE.
-          Depois de salvar, você poderá vinculá-lo a uma LINE.
-        </p>
+        <h3 class="form-section-title">Disponibilidade e experiência</h3>
+        <div class="form-grid">
+          <label>
+            Horário de disponibilidade
+            <input class="field" name="horario_disponibilidade" placeholder="Ex.: 19h às 23h" value="${esc(player.horario_disponibilidade)}">
+          </label>
+
+          <label>
+            Frequência de jogo
+            <input class="field" name="frequencia_jogo" placeholder="Ex.: todos os dias" value="${esc(player.frequencia_jogo)}">
+          </label>
+
+          <label>
+            Quantas horas joga por dia
+            <input class="field" type="number" name="horas_por_dia" min="0" max="24" step="0.5" value="${esc(player.horas_por_dia)}">
+          </label>
+
+          <label>
+            Já participou de outra guilda?
+            <select class="field" name="participou_outra_guilda" id="participou-outra-guilda">
+              <option value="false" ${!participated ? 'selected' : ''}>Não</option>
+              <option value="true" ${participated ? 'selected' : ''}>Sim</option>
+            </select>
+          </label>
+
+          <label class="full-field">
+            Qual guilda?
+            <input class="field" name="outra_guilda" id="outra-guilda" value="${esc(player.outra_guilda)}" ${participated ? '' : 'disabled'}>
+          </label>
+        </div>
+
+        <p class="muted">O cadastro será associado automaticamente ao usuário autenticado que realizar esta ação.</p>
 
         <div class="form-actions">
-          <button type="button" class="btn" id="cancel-player">
-            Cancelar
-          </button>
-
-          <button type="submit" class="btn btn-primary">
-            Salvar jogador
-          </button>
+          <button type="button" class="btn" id="cancel-player">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar jogador</button>
         </div>
       </form>
     `;
 
     const form = slot.querySelector('#player-form');
+    const participatedField = form.elements.namedItem('participou_outra_guilda');
+    const otherGuildField = form.elements.namedItem('outra_guilda');
 
-    slot.querySelector('#cancel-player')
-      .addEventListener('click', () => {
-        editPlayer = null;
-        slot.innerHTML = '';
-      });
+    function syncOtherGuild() {
+      const enabled = participatedField.value === 'true';
+      otherGuildField.disabled = !enabled;
+      if (!enabled) otherGuildField.value = '';
+    }
+
+    participatedField.addEventListener('change', syncOtherGuild);
+    syncOtherGuild();
+
+    slot.querySelector('#cancel-player').addEventListener('click', () => {
+      editPlayer = null;
+      slot.innerHTML = '';
+    });
 
     form.addEventListener('submit', async event => {
       event.preventDefault();
 
       const button = form.querySelector('[type="submit"]');
       if (button.disabled) return;
-
       button.disabled = true;
 
       try {
-        const data = Object.fromEntries(
-          new FormData(form).entries()
-        );
+        const data = Object.fromEntries(new FormData(form).entries());
+        const { data: authData } = await db.auth.getUser();
+        const userId = authData?.user?.id || null;
+
+        data.idade = data.idade ? Number(data.idade) : null;
+        data.horas_por_dia = data.horas_por_dia ? Number(data.horas_por_dia) : null;
+        data.participou_outra_guilda = data.participou_outra_guilda === 'true';
+        data.data_nascimento ||= null;
+        data.id_free_fire ||= null;
+        data.numero_celular ||= null;
+        data.cidade ||= null;
+        data.estado = data.estado ? data.estado.trim().toUpperCase() : null;
+        data.horario_disponibilidade ||= null;
+        data.frequencia_jogo ||= null;
+        data.outra_guilda ||= null;
+        data.instagram ||= null;
+
+        if (editPlayer) {
+          data.atualizado_por = userId;
+          data.atualizado_em = new Date().toISOString();
+        } else {
+          data.cadastrado_por = userId;
+        }
 
         const result = editPlayer
-          ? await db.from('jogadores')
-              .update(data)
-              .eq('id', editPlayer)
+          ? await db.from('jogadores').update(data).eq('id', editPlayer)
           : await db.from('jogadores').insert(data);
 
         if (result.error) {
-          notice(
-            'Erro ao salvar jogador: ' + result.error.message,
-            'error'
-          );
+          notice('Erro ao salvar jogador: ' + result.error.message, 'error');
           return;
         }
 
@@ -439,7 +499,7 @@
   }
 
   // =====================================================
-  // LINEs — a tabela equipes continua sendo usada no banco
+  // Lines — a tabela equipes continua sendo usada no banco
   // =====================================================
 
   function renderLines(content) {
@@ -457,8 +517,8 @@
           id="search-line"
           class="field"
           type="search"
-          placeholder="Buscar LINE"
-          aria-label="Buscar LINE"
+          placeholder="Buscar Line"
+          aria-label="Buscar Line"
         >
 
         <button
@@ -466,7 +526,7 @@
           class="btn btn-primary"
           id="new-line"
         >
-          + Nova LINE
+          + Nova Line
         </button>
       </div>
 
@@ -514,13 +574,13 @@
                         class="btn btn-primary btn-small"
                         data-manage-line="${esc(team.id)}"
                       >
-                        Gerenciar LINE
+                        Gerenciar Line
                       </button>
                     </div>
                   </article>
                 `;
               }).join('')
-            : '<p>Nenhuma LINE cadastrada.</p>'
+            : '<p>Nenhuma Line cadastrada.</p>'
         }
       </div>
 
@@ -574,11 +634,11 @@
 
     slot.innerHTML = `
       <form class="crud-form" id="line-form">
-        <h2>${editTeam ? 'Editar LINE' : 'Cadastrar LINE'}</h2>
+        <h2>${editTeam ? 'Editar Line' : 'Cadastrar Line'}</h2>
 
         <div class="form-grid">
           <label>
-            Nome da LINE *
+            Nome da Line *
             <input
               class="field"
               name="nome"
@@ -646,7 +706,7 @@
           </button>
 
           <button type="submit" class="btn btn-primary">
-            Salvar LINE
+            Salvar Line
           </button>
         </div>
       </form>
@@ -685,7 +745,7 @@
 
         if (result.error) {
           notice(
-            'Erro ao salvar LINE: ' + result.error.message,
+            'Erro ao salvar Line: ' + result.error.message,
             'error'
           );
           return;
@@ -695,10 +755,10 @@
         await load();
         tab = 'lines';
         render();
-        notice('LINE salva com sucesso.', 'success');
+        notice('Line salva com sucesso.', 'success');
       } catch (error) {
         console.error(error);
-        notice('Erro inesperado ao salvar a LINE.', 'error');
+        notice('Erro inesperado ao salvar a Line.', 'error');
       } finally {
         button.disabled = false;
       }
@@ -708,7 +768,7 @@
   }
 
   // =====================================================
-  // VÍNCULO ENTRE JOGADORES E LINEs
+  // VÍNCULO ENTRE JOGADORES E Lines
   // =====================================================
 
   function renderLineMembers(content) {
@@ -717,7 +777,7 @@
     );
 
     if (!team) {
-      notice('Selecione uma LINE válida.', 'error');
+      notice('Selecione uma Line válida.', 'error');
       return;
     }
 
@@ -735,7 +795,7 @@
 
     slot.innerHTML = `
       <div class="crud-form">
-        <h2>LINE: ${esc(team.nome)}</h2>
+        <h2>Line: ${esc(team.nome)}</h2>
 
         <div class="crud-toolbar">
           <span>Elenco e histórico de participações</span>
@@ -792,7 +852,7 @@
                   : `
                     <tr>
                       <td colspan="6" class="empty-cell">
-                        Nenhum jogador vinculado a esta LINE.
+                        Nenhum jogador vinculado a esta Line.
                       </td>
                     </tr>
                   `
@@ -846,7 +906,7 @@
 
     slot.innerHTML = `
       <form class="crud-form" id="member-form">
-        <h3>${editMember ? 'Editar participação' : 'Vincular jogador à LINE'}</h3>
+        <h3>${editMember ? 'Editar participação' : 'Vincular jogador à Line'}</h3>
 
         <div class="form-grid">
           <label>
@@ -920,7 +980,7 @@
         </div>
 
         <p class="muted">
-          O jogador continua cadastrado mesmo se sair da LINE.
+          O jogador continua cadastrado mesmo se sair da Line.
         </p>
 
         <div class="form-actions">
@@ -987,7 +1047,7 @@
 
       if (duplicate) {
         notice(
-          'Este jogador já está ativo nesta LINE.',
+          'Este jogador já está ativo nesta Line.',
           'error'
         );
         return;
@@ -1056,7 +1116,7 @@
       String(item.id) !== String(member.id)
     )) {
       notice(
-        'Este jogador já possui uma participação ativa nesta LINE.',
+        'Este jogador já possui uma participação ativa nesta Line.',
         'error'
       );
       return;
