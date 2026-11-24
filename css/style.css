@@ -964,3 +964,13 @@ body { background: var(--bg); }
 .login-page .login-logo { background: #d6a437; box-shadow: none; }
 .login-page #login-form .login-submit { background: #d6a437; box-shadow: none; }
 .login-page #login-form .login-submit:hover { background: #e5b445; }
+
+/* Assets de marca */
+.brand-mark img,
+.login-logo img {
+  display: block;
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+}
+.login-logo img { width: 78%; height: 78%; }
