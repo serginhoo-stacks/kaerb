@@ -3,6 +3,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   const page = document.body.dataset.page || "dashboard";
+  document.querySelectorAll('.sidebar a[href="./contratos.html"], .sidebar a[href="./patrocinadores.html"], .sidebar a[href="./departamentos.html"]').forEach((link) => link.remove());
   const meta = { dashboard: ["Visão geral", "Dashboard", "Acompanhe a operação da Kaerb Esports em um só lugar."], equipes: ["Equipes e jogadores", "Equipes e jogadores", "Organize elencos, jogadores e linhas competitivas."], financeiro: ["Financeiro", "Financeiro", "Estruture receitas, despesas, pagamentos e premiações."], campeonatos: ["Campeonatos", "Campeonatos", "Acompanhe inscrições, resultados e calendário competitivo."], historico: ["Histórico de ações", "Histórico de ações", "Prepare a auditoria das atividades administrativas."] }[page];
   if (page === "login") return;
   if (meta) { document.title = `Kaerb Esports | ${meta[1]}`; document.querySelectorAll("[data-page-title]").forEach((node) => { node.textContent = meta[0]; }); document.querySelectorAll("[data-page-description]").forEach((node) => { node.textContent = meta[2]; }); document.querySelectorAll("[data-breadcrumb]").forEach((node) => { node.textContent = meta[1]; }); }
