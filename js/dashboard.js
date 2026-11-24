@@ -3,6 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const db = window.kaerbSupabase;
   const root = document.getElementById("dashboard-root");
+  let initialized = false;
   if (!root) return;
 
   const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -100,5 +101,17 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (missing.length) notice(`Para completar o dashboard, execute o SQL: faltam ${missing.join(", ")}.`, "info");
   }
 
-  document.addEventListener("kaerb:ready", load, { once: true });
+  function init() {
+    if (initialized) return;
+    initialized = true;
+    load().catch(error => {
+      console.error("Kaerb ERP — erro ao carregar o dashboard:", error);
+      root.innerHTML = `<div class="notice notice-error"><span class="notice-icon">!</span><div><strong>Não foi possível carregar o dashboard.</strong><p>${esc(error.message || "Verifique a conexão com o Supabase.")}</p></div></div>`;
+    });
+  }
+
+  document.addEventListener("kaerb:ready", init, { once: true });
+  if (window.kaerbReady && typeof window.kaerbReady.then === "function") {
+    window.kaerbReady.then(isReady => { if (isReady) init(); });
+  }
 });
